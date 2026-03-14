@@ -6,32 +6,32 @@ on:
   pull_request:
 
 jobs:
-  wheels:
-    name: Build wheels (Windows)
+  wheel:
+    name: Build wheel (py${{ matrix.python-version }})
     runs-on: windows-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.9", "3.10", "3.11", "3.12", "3.13"]
+
     steps:
       - uses: actions/checkout@v4
 
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: "3.13"
+          python-version: ${{ matrix.python-version }}
 
-      - name: Install build tooling
+      - name: Set up MSVC
+        uses: ilammy/msvc-dev-cmd@v1
+
+      - name: Build wheel
         run: |
           python -m pip install --upgrade pip
-          python -m pip install cibuildwheel==2.21.3
-
-      - name: Build wheels
-        env:
-          CIBW_BUILD: "cp39-win_amd64 cp310-win_amd64 cp311-win_amd64 cp312-win_amd64 cp313-win_amd64"
-          CIBW_SKIP: "*-win32"
-          CIBW_ARCHS_WINDOWS: "AMD64"
-          CIBW_BUILD_VERBOSITY: "1"
-        run: |
-          python -m cibuildwheel --output-dir dist
+          python -m pip wheel . -w dist --no-deps -v
 
       - uses: actions/upload-artifact@v4
         with:
           name: wheels
           path: dist/*.whl
+
