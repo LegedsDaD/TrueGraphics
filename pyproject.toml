@@ -1,0 +1,52 @@
+[build-system]
+requires = [
+  "scikit-build-core>=0.10.7",
+  "pybind11>=2.11.1",
+]
+build-backend = "scikit_build_core.build"
+
+[project]
+name = "truegraphics"
+version = "1.0.0"
+description = "TrueGraphics: a C++-accelerated GUI and graphics framework with Python bindings"
+readme = "README.md"
+requires-python = ">=3.9"
+license = { file = "LICENSE" }
+authors = [
+  { name = "LegedsDaD", email = "legendsdad001@gmail.com" },
+]
+keywords = ["gui", "graphics", "widgets", "renderer", "engine", "pybind11"]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Intended Audience :: Developers",
+  "License :: OSI Approved :: MIT License",
+  "Operating System :: Microsoft :: Windows",
+  "Programming Language :: C++",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Topic :: Software Development :: User Interfaces",
+]
+dependencies = []
+
+[project.urls]
+Homepage = "https://github.com/LegedsDaD/TrueGraphics"
+Repository = "https://github.com/LegedsDaD/TrueGraphics"
+
+[tool.scikit-build]
+cmake.minimum-version = "3.20"
+cmake.build-type = "Release"
+wheel.packages = ["python/truegraphics"]
+sdist.include = [
+  "engine/**",
+  "bindings/**",
+  "python/**",
+  "examples/**",
+  "CMakeLists.txt",
+  "README.md",
+  "MANUAL.md",
+  "LICENSE",
+]
