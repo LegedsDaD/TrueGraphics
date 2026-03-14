@@ -23,15 +23,22 @@ TrueGraphics is a small Windows-only GUI experiment: a C++ core (Win32 + GDI) wi
 
 ## Installation
 
+```BASH
+pip install truegraphics
+```
+
 ```bash
 pip install .
 ```
+
+## See [Manual](https://github.com/LegedsDaD/TrueGraphics/blob/main/MANUAL.md)to get more information about , how to use .
 
 Requirements (Windows):
 - Python 3.9+
 - CMake 3.20+
 - A C++ toolchain: MSVC (Visual Studio Build Tools) or MinGW-w64 (MSYS2)
 
+## If downloading using `pip install .`
 MinGW note:
 - MinGW builds work, but image support requires `gdiplus` (linked automatically via CMake when using a toolchain that provides it).
 
@@ -201,9 +208,4 @@ python examples/showcase.py
 
 This version targets Windows and uses an internal Win32-backed event loop with an engine-side scene/widget model. Rendering is implemented as a lightweight internal renderer abstraction that currently uses GDI-based drawing while preserving the C++ engine architecture for future GPU backend expansion.
 
-## Releases (Wheels + PyPI Trusted Publishing)
-
-This repo includes GitHub Actions workflows to build Windows wheels and publish them to PyPI using PyPI “Trusted Publishing” (OIDC):
-
-- CI wheel builds: `.github/workflows/ci.yml`
-- Publish on tags `v*`: `.github/workflows/publish.yml`
+`
