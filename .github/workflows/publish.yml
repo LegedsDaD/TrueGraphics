@@ -2,18 +2,15 @@ name: Publish to PyPI
 
 on:
   workflow_dispatch:
-  push:
-    tags:
-      - "v*"
 
 permissions:
   contents: read
   id-token: write
 
 jobs:
-  build:
-    name: Build sdist + wheels
-    runs-on: windows-latest
+  sdist:
+    name: Build sdist
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
@@ -22,32 +19,68 @@ jobs:
         with:
           python-version: "3.13"
 
-      - name: Install build tooling
-        run: |
-          python -m pip install --upgrade pip
-          python -m pip install build==1.2.2.post1 cibuildwheel==2.21.3
-
       - name: Build sdist
         run: |
+          python -m pip install --upgrade pip build
           python -m build --sdist --outdir dist
-
-      - name: Build wheels
-        env:
-          CIBW_BUILD: "cp39-win_amd64 cp310-win_amd64 cp311-win_amd64 cp312-win_amd64 cp313-win_amd64"
-          CIBW_SKIP: "*-win32"
-          CIBW_ARCHS_WINDOWS: "AMD64"
-          CIBW_BUILD_VERBOSITY: "1"
-        run: |
-          python -m cibuildwheel --output-dir dist
 
       - uses: actions/upload-artifact@v4
         with:
-          name: dist
-          path: dist/*
+          name: dist-sdist
+          path: dist/*.tar.gz
+
+  wheels:
+    name: Build wheels (py${{ matrix.python-version }})
+    runs-on: windows-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.9", "3.10", "3.11", "3.12", "3.13"]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up MSYS2 (MinGW toolchain)
+        uses: msys2/setup-msys2@v2
+        with:
+          msystem: UCRT64
+          update: true
+          install: >-
+            mingw-w64-ucrt-x86_64-toolchain
+            mingw-w64-ucrt-x86_64-cmake
+            mingw-w64-ucrt-x86_64-make
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Add MinGW to PATH
+        shell: pwsh
+        run: |
+          Add-Content $env:GITHUB_PATH "C:\\msys64\\ucrt64\\bin"
+
+      - name: Build + install (MinGW Makefiles) [smoke]
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install . -v --config-settings=cmake.args="-G MinGW Makefiles"
+
+      - name: Build wheel (MinGW Makefiles)
+        run: |
+          python -m pip wheel . -w dist --no-deps -v --config-settings=cmake.args="-G MinGW Makefiles"
+
+      - name: Import check
+        run: |
+          python -c "import truegraphics as tg; print('truegraphics', tg.__version__)"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dist-wheels-${{ matrix.python-version }}
+          path: dist/*.whl
 
   publish:
-    name: Publish
-    needs: build
+    name: Publish (Trusted Publishing)
+    needs: [sdist, wheels]
     runs-on: ubuntu-latest
     environment:
       name: pypi
@@ -55,11 +88,16 @@ jobs:
     steps:
       - uses: actions/download-artifact@v4
         with:
-          name: dist
+          name: dist-sdist
           path: dist
 
-      - name: Publish to PyPI (Trusted Publishing)
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: dist-wheels-*
+          path: dist
+          merge-multiple: true
+
+      - name: Publish to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
           packages-dir: dist
-
