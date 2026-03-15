@@ -31,7 +31,7 @@ pip install truegraphics
 pip install .
 ```
 
-## See [Manual](https://github.com/LegedsDaD/TrueGraphics/blob/main/MANUAL.md)to get more information about , how to use .
+## See [Manual](https://github.com/LegedsDaD/TrueGraphics/blob/main/MANUAL.md) to get more information about , how to use .
 
 Requirements (Windows):
 - Python 3.9+
@@ -208,4 +208,5 @@ python examples/showcase.py
 
 This version targets Windows and uses an internal Win32-backed event loop with an engine-side scene/widget model. Rendering is implemented as a lightweight internal renderer abstraction that currently uses GDI-based drawing while preserving the C++ engine architecture for future GPU backend expansion.
 
-`
+## Help TrueGraphics to get compatible with MacOS and Linux .
+## Thank You for taking time to see the project . 
