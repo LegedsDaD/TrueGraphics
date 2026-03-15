@@ -1,5 +1,6 @@
 # TrueGraphics
-
+[![PyPI Downloads](https://static.pepy.tech/personalized-badge/truegraphics?period=total&units=INTERNATIONAL_SYSTEM&left_color=BLACK&right_color=ORANGE&left_text=downloads)](https://pepy.tech/projects/truegraphics)
+---
 TrueGraphics is a small Windows-only GUI experiment: a C++ core (Win32 + GDI) with Python bindings built using `pybind11`.
 
 ## Overview
